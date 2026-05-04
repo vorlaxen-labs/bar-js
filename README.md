@@ -1,4 +1,4 @@
-# 🥂 BaR (Builder a Response)
+# 🥂 BaR (Builder and Response)
 
 [![npm version](https://img.shields.io/badge/npm-v1.0.0-blue.svg)](https://www.npmjs.com/package/@vorlaxen/bar)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -6,82 +6,143 @@
 
 **Design your API responses like a pro, serve them like a bartender.**
 
-`BaR` is a lightweight, TypeScript-based response builder designed to eliminate JSON clutter in backend applications. It ensures every response follows a consistent structure with automatic timestamps, request tracking, and metadata injection.
+`BaR` is a framework-agnostic, lightweight TypeScript response builder. It eliminates JSON clutter and ensures every API response follows a consistent, production-ready schema with built-in traceability and security.
 
 ---
 
 ## ✨ Features
 
-*   **Fluent Interface:** Build responses with a readable, chainable, and intuitive syntax.
-*   **Absolute Consistency:** Guarantees your API returns a predictable schema for both success and error states.
-*   **Automatic Traceability:** Built-in management for `request_id`, `server_time`, and ISO timestamps.
-*   **Secure by Default:** Automatically appends essential security headers (HSTS, No-Sniff, etc.).
-*   **Full Type Safety:** Written in TypeScript for top-tier IntelliSense support.
+*   🚀 **Framework Agnostic:** Seamlessly integrates with Express, Fastify, Koa, or Vanilla Node.js.
+*   🔗 **Fluent Interface:** Build responses with an intuitive, chainable syntax.
+*   🛠️ **Dispatcher Strategy:** One `.build()` call to rule them all—automatically handles headers and framework-specific sending logic.
+*   🛡️ **Secure & Standardized:** Automatic security headers, request tracking (`request_id`), and ISO timestamps.
+*   📐 **Type-Safe:** Built with strict TypeScript for excellent IntelliSense and runtime reliability.
 
 ---
 
 ## 📦 Installation
 ```bash
-npm install @vorlaxen/bar
+npm install @vorlaxen/bar-js
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🔌 Framework Integration
 
-### 1. Initialize the Middleware
-Integrate the `BaR` builder into the Express `res` object.
+`BaR` uses a **Dispatcher Pattern**. The builder creates the response, and the Dispatcher handles the delivery through your framework of choice.
 
+### Express.js
 ```typescript
 import express from 'express';
-import { BaR } from '@vorlaxen/bar';
+import { barExpress } from '@vorlaxen/bar/adapters';
 
 const app = express();
 
-// Middleware makes 'res.builder' accessible in all routes
-app.use(BaR.init());
+// Injects 'res.builder' into the response object
+app.use(barExpress);
+
+app.get('/api/user', (req, res) => {
+  return res.builder.as.ok({ name: 'Vorlaxen' }).build();
+});
 ```
 
-### 2. Send Your First Response
-Stop creating manual JSON objects. Serve your data with a single chain.
-
+### Fastify
 ```typescript
-app.get('/api/data', (req, res) => {
-  const data = { user: "Vorlaxen", role: "Admin" };
-  
-  // Clean, standard, and secure
-  return res.builder.as.ok(data, "Welcome to BaR!").send();
+import Fastify from 'fastify';
+import { barFastify } from '@vorlaxen/bar/adapters';
+
+const fastify = Fastify();
+
+// Registers 'reply.builder'
+fastify.register(barFastify);
+
+fastify.get('/api/user', async (request, reply) => {
+  return reply.builder.as.ok({ name: 'Vorlaxen' }).build();
 });
 ```
 
 ---
 
-## 📐 Sample Response Structure
+## 🍹 Usage Guide
 
-Every response served by **BaR** follows this standard structure:
+### 1. Semantic Presets (`.as`)
+Stop memorizing status codes. Use semantic aliases for common scenarios:
+```typescript
+// 200 OK
+res.builder.as.ok(data, "Success!");
 
+// 201 Created
+res.builder.as.created(newItem);
+
+// 401 Unauthorized
+res.builder.as.unauthorized("Invalid credentials");
+
+// 404 Not Found
+res.builder.as.notFound("User not found");
+```
+
+### 2. The Auto-Dispatching `.build()`
+When using an adapter (Express/Fastify), calling `.build()` finalized the metadata and **automatically sends** the response.
+```typescript
+return res.builder
+  .status(202)
+  .data({ taskId: 'abc-123' })
+  .message("Processing started")
+  .header('X-Process-Queue', 'High')
+  .setMeta({ cluster: 'us-east-1' })
+  .build(); // Automatically executes res.status().json() or reply.send()
+```
+
+---
+
+## 📐 Standard Schema
+
+Every response served by **BaR** follows this predictable structure:
 ```json
 {
   "success": true,
-  "timestamp": "2026-05-03T16:20:00.000Z",
-  "message": "Resource updated successfully.",
+  "timestamp": "2026-05-04T13:52:00.000Z",
+  "message": "Resource retrieved successfully",
   "data": {
-    "id": "123",
-    "status": "active"
+    "id": 1,
+    "username": "vorlaxen"
   },
   "metadata": {
-    "request_id": "internal-6hu261xbp",
-    "server_time": "2026-05-03T16:20:00.000Z",
-    "action_type": "UPDATED"
+    "status_code": 200,
+    "request_id": "req-98234-jsl",
+    "server_time": "2026-05-04T13:52:00.000Z"
   }
 }
 ```
 
 ---
 
-### 💡 Why BaR?
-Consistency is everything in modern API development. `BaR` builds the bridge by ensuring your frontend team knows exactly what to expect from your endpoints. No more guessing where the message is; everything is always in its right place. 🥂
+## 🛠️ Advanced: Custom Dispatchers
+
+If you are using a custom framework or want to modify how responses are sent, implement the `IBaRDispatcher` interface:
+```typescript
+import { IBaRDispatcher, BaRFinalResult } from '@vorlaxen/bar';
+
+class MyCoolDispatcher implements IBaRDispatcher {
+  constructor(private myResponseObj: any) {}
+
+  dispatch(result: BaRFinalResult) {
+    // Implement your own sending logic here
+    this.myResponseObj.setHeaders(result.headers);
+    return this.myResponseObj.send(result.statusCode, result.body);
+  }
+}
+
+// Manual usage
+const builder = new ResponseBuilder(new MyCoolDispatcher(customRes));
+```
 
 ---
 
-> **"Your code is a work of art, and your responses are its signature; the clearer the signature, the more valuable the work."**
+## ⚖️ License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+> **"Your code is a work of art, and your responses are its signature; the clearer the signature, the more valuable the work."** 🥂
