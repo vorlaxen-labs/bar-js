@@ -1,5 +1,5 @@
-import { ResponseBuilder } from '../../core/response.factory';
-import { BaRContext } from '../bar-context.types';
+import { ResponseBuilder } from '@/core/response.factory';
+import { BaRContext } from './bar-context.types';
 
 declare global {
     namespace Express {
@@ -11,3 +11,5 @@ declare global {
         }
     }
 }
+
+export {};
