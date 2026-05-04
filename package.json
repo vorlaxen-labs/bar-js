@@ -18,7 +18,11 @@
     "lint": "eslint .",
     "prepublishOnly": "npm run build && npm run test"
   },
+  "peerDependencies": {
+    "express": "^4.0.0 || ^5.0.0"
+  },
   "devDependencies": {
+    "express": "^5.2.1",
     "@eslint/js": "^10.0.1",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/github": "^12.0.6",
@@ -40,8 +44,5 @@
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.1"
-  },
-  "dependencies": {
-    "express": "^5.2.1"
   }
 }
