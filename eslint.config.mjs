@@ -10,9 +10,10 @@ export default [
   ...tseslint.configs.recommended,
   {
     rules: {
-      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-explicit-any": "off", // any kullanımına izin ver
+      "@typescript-eslint/no-empty-object-type": "off", // {} kullanımına izin ver
       "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": ["warn"]
-    }
-  }
+      "@typescript-eslint/no-unused-vars": ["warn"],
+    },
+  },
 ];
