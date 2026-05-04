@@ -18,6 +18,6 @@
     "types": ["jest", "node", "express"],
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "include": ["src/**/*", "tests/**/*"],
+  "include": ["src/**/*", "tests/**/*", "src/types/express.d.ts"],
   "exclude": ["node_modules", "dist"]
 }

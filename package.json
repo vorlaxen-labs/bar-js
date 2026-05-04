@@ -1,5 +1,5 @@
 {
-  "name": "@vorlaxen-labs/bar-js",
+  "name": "@vorlaxen-labs/bar",
   "version": "1.0.0",
   "description": "Professional API response builder for Node.js and TypeScript.",
   "main": "./dist/index.js",

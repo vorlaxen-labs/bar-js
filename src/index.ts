@@ -1,4 +1,3 @@
-/// <reference path="./types/express.d.ts" />
 export * from './core';
 export * from './interfaces';
 export * from './constants';
