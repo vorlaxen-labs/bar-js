@@ -1,3 +1,5 @@
+import * as express from 'express';
+
 import { ResponseBuilder } from '@/core/response.factory';
 import { BaRContext } from './bar-context.types';
 
@@ -11,5 +13,3 @@ declare global {
         }
     }
 }
-
-export {};
