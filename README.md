@@ -1,4 +1,4 @@
-# 🥂 BaR (Builder and Response)
+# 🥂 BaR (Builder a Response)
 
 [![npm version](https://img.shields.io/badge/npm-v1.0.0-blue.svg)](https://www.npmjs.com/package/@vorlaxen-labs/bar-js)
 [![License: MIT License](https://img.shields.io/badge/License-mit-blue.svg)](https://opensource.org/licenses/MIT)
