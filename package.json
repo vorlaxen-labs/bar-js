@@ -14,10 +14,11 @@
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "test": "jest",
-    "lint": "eslint 'src/**/*.{ts,tsx}'",
+    "lint": "eslint .",
     "prepublishOnly": "npm run build && npm run test"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/github": "^12.0.6",
     "@semantic-release/npm": "^13.1.5",
@@ -30,11 +31,13 @@
     "@typescript-eslint/eslint-plugin": "^8.59.1",
     "@typescript-eslint/parser": "^8.59.1",
     "eslint": "^10.3.0",
+    "globals": "^17.6.0",
     "jest": "^30.3.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.9",
     "tsup": "^8.5.1",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.1"
   },
   "dependencies": {
     "express": "^5.2.1"
