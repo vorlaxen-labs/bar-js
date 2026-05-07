@@ -1,11 +1,12 @@
 import { StatusCodes } from '../constants/status-codes.constant';
+import { IMetadata } from '../interfaces/IResponse.interface';
 import { ResponseBuilder } from './response.factory';
 
 /**
  * @class ResponseAs
  * @description Provides semantic presets for the ResponseBuilder using standardized status codes.
  */
-export class ResponseAs<T, M extends Record<string, any>> {
+export class ResponseAs<T, M extends IMetadata> {
   constructor(private readonly _builder: ResponseBuilder<T, M>) {}
 
   // --- SUCCESSFUL (2xx) ---
@@ -29,44 +30,44 @@ export class ResponseAs<T, M extends Record<string, any>> {
   // --- CLIENT ERRORS (4xx) ---
 
   public badRequest(message: string = 'Bad Request'): ResponseBuilder<T, M> {
-    return this._builder.status(StatusCodes.CLIENT_ERROR.BAD_REQUEST).message(message).success(false);
+    return this._builder.status(StatusCodes.CLIENT_ERROR.BAD_REQUEST).message(message).forceSuccess(false);
   }
 
   public unauthorized(message: string = 'Unauthorized access'): ResponseBuilder<T, M> {
-    return this._builder.status(StatusCodes.CLIENT_ERROR.UNAUTHORIZED).message(message).success(false);
+    return this._builder.status(StatusCodes.CLIENT_ERROR.UNAUTHORIZED).message(message).forceSuccess(false);
   }
 
   public forbidden(message: string = 'Access forbidden'): ResponseBuilder<T, M> {
-    return this._builder.status(StatusCodes.CLIENT_ERROR.FORBIDDEN).message(message).success(false);
+    return this._builder.status(StatusCodes.CLIENT_ERROR.FORBIDDEN).message(message).forceSuccess(false);
   }
 
   public notFound(message: string = 'Resource not found'): ResponseBuilder<T, M> {
-    return this._builder.status(StatusCodes.CLIENT_ERROR.NOT_FOUND).message(message).success(false);
+    return this._builder.status(StatusCodes.CLIENT_ERROR.NOT_FOUND).message(message).forceSuccess(false);
   }
 
   public conflict(message: string = 'Conflict detected'): ResponseBuilder<T, M> {
-    return this._builder.status(StatusCodes.CLIENT_ERROR.CONFLICT).message(message).success(false);
+    return this._builder.status(StatusCodes.CLIENT_ERROR.CONFLICT).message(message).forceSuccess(false);
   }
 
   public unprocessable(message: string = 'Unprocessable entity'): ResponseBuilder<T, M> {
-    return this._builder.status(StatusCodes.CLIENT_ERROR.UNPROCESSABLE_ENTITY).message(message).success(false);
+    return this._builder.status(StatusCodes.CLIENT_ERROR.UNPROCESSABLE_ENTITY).message(message).forceSuccess(false);
   }
 
   public tooManyRequests(message: string = 'Too many requests, please slow down'): ResponseBuilder<T, M> {
-    return this._builder.status(StatusCodes.CLIENT_ERROR.TOO_MANY_REQUESTS).message(message).success(false);
+    return this._builder.status(StatusCodes.CLIENT_ERROR.TOO_MANY_REQUESTS).message(message).forceSuccess(false);
   }
 
   // --- SERVER ERRORS (5xx) ---
 
   public internalServerError(message: string = 'Internal server error'): ResponseBuilder<T, M> {
-    return this._builder.status(StatusCodes.SERVER_ERROR.INTERNAL_SERVER_ERROR).message(message).success(false);
+    return this._builder.status(StatusCodes.SERVER_ERROR.INTERNAL_SERVER_ERROR).message(message).forceSuccess(false);
   }
 
   public serviceUnavailable(message: string = 'Service temporarily unavailable'): ResponseBuilder<T, M> {
-    return this._builder.status(StatusCodes.SERVER_ERROR.SERVICE_UNAVAILABLE).message(message).success(false);
+    return this._builder.status(StatusCodes.SERVER_ERROR.SERVICE_UNAVAILABLE).message(message).forceSuccess(false);
   }
 
   public gatewayTimeout(message: string = 'Gateway timeout'): ResponseBuilder<T, M> {
-    return this._builder.status(StatusCodes.SERVER_ERROR.GATEWAY_TIMEOUT).message(message).success(false);
+    return this._builder.status(StatusCodes.SERVER_ERROR.GATEWAY_TIMEOUT).message(message).forceSuccess(false);
   }
 }

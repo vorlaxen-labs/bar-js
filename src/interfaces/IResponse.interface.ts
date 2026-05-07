@@ -33,6 +33,20 @@ export interface Logger {
   debug?(message: string, meta?: unknown): void;
 }
 
+export interface QueuedCookie {
+  name: string;
+  value: string;
+  options?: Record<string, unknown>;
+}
+
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+  has_next: boolean;
+}
+
 export type BaRHookEvent =
   | 'before_build'
   | 'after_build'
