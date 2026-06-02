@@ -1,12 +1,18 @@
-import { randomUUID } from "crypto";
-import { Request } from "express";
 import { BaRContext } from "../types/bar-context.types";
+import { IncomingHttpRequest, resolveRequestId } from "../utils/request-id.util";
+
+export type BaRContextFactoryOptions = {
+  requestIdHeaders?: readonly string[];
+};
 
 export class BaRContextFactory {
-  public static create(req: Request): BaRContext {
+  public static create(
+    req: IncomingHttpRequest,
+    options: BaRContextFactoryOptions = {},
+  ): BaRContext {
     return {
-      request_id: randomUUID(),
-      start_time: Date.now()
+      request_id: resolveRequestId(req, options.requestIdHeaders),
+      start_time: Date.now(),
     };
   }
 }

@@ -2,7 +2,6 @@ import { BaRHooks, ResponseBuilder } from '../src/core';
 
 describe('BaR Unit Tests', () => {
 
-    // ─── Builder Temel ─────────────────────────────────────────────────────
     describe('Builder - Temel Mantık', () => {
 
         it('varsayılan response shape doğru olmalı', () => {
@@ -47,6 +46,14 @@ describe('BaR Unit Tests', () => {
             expect(res.headers['X-Auth']).toBe('secret');
         });
 
+        it('header() setHeaders alias olmalı', () => {
+            const res = new ResponseBuilder()
+                .header('X-Alias', 'yes')
+                .build();
+
+            expect(res.headers['X-Alias']).toBe('yes');
+        });
+
         it('setCookies() kuyruğa doğru eklemeli', () => {
             const res = new ResponseBuilder()
                 .setCookies('session', '123', { httpOnly: true })
@@ -56,9 +63,15 @@ describe('BaR Unit Tests', () => {
             expect(res.cookies).toContainEqual({ name: 'session', value: '123', options: { httpOnly: true } });
             expect(res.cookies).toContainEqual({ name: 'theme', value: 'dark', options: undefined });
         });
+
+        it('context request_id metadata ile eşleşmeli', () => {
+            const ctx = { request_id: 'fixed-id-123', start_time: 1 };
+            const res = new ResponseBuilder(undefined, undefined, ctx).build();
+
+            expect(res.body.metadata.request_id).toBe('fixed-id-123');
+        });
     });
 
-    // ─── Gelişmiş Özellikler (Wrap, Transform, When) ───────────────────────
     describe('Builder - Gelişmiş Fonksiyonlar', () => {
 
         it('wrap() başarılı promise verisini set etmeli', async () => {
@@ -70,14 +83,41 @@ describe('BaR Unit Tests', () => {
             expect(res.statusCode).toBe(200);
         });
 
-        it('wrap() reject durumunda 500 dönmeli', async () => {
-            const builder = new ResponseBuilder();
+        it('wrap() reject durumunda 500 dönmeli (development)', async () => {
+            const builder = new ResponseBuilder(undefined, { environment: 'development' });
             await builder.wrap(Promise.reject(new Error('DB Error')));
             const res = builder.build();
 
             expect(res.statusCode).toBe(500);
             expect(res.body.message).toBe('DB Error');
             expect(res.body.success).toBe(false);
+            expect(res.body.data).toBeNull();
+        });
+
+        it('wrap() production ortamında generic mesaj dönmeli', async () => {
+            const builder = new ResponseBuilder(undefined, { environment: 'production' });
+            await builder.wrap(Promise.reject(new Error('Secret DB leak')));
+            const res = builder.build();
+
+            expect(res.body.message).toBe('Internal Server Error');
+            expect(res.body.message).not.toContain('Secret');
+        });
+
+        it('wrap() reject error hook tetiklemeli', async () => {
+            const hooks = new BaRHooks();
+            const errorFn = jest.fn();
+            hooks.on('error', errorFn);
+
+            const builder = new ResponseBuilder(undefined, { hooks, environment: 'development' });
+            await builder.wrap(Promise.reject(new Error('Hook test')));
+            builder.build();
+
+            expect(errorFn).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    error: expect.any(Error),
+                    statusCode: 500,
+                }),
+            );
         });
 
         it('transform() veriyi manipüle etmeli', () => {
@@ -102,7 +142,7 @@ describe('BaR Unit Tests', () => {
 
         it('paginate() metadata’yı doğru hesaplamalı', () => {
             const res = new ResponseBuilder()
-                .paginate(100, 2, 20) // total, page, limit
+                .paginate(100, 2, 20)
                 .build();
 
             expect(res.body.metadata.pagination).toEqual({
@@ -113,9 +153,14 @@ describe('BaR Unit Tests', () => {
                 has_next: true
             });
         });
+
+        it('paginate() limit <= 0 ise hata fırlatmalı', () => {
+            expect(() => new ResponseBuilder().paginate(10, 1, 0)).toThrow(
+                /limit must be greater than 0/,
+            );
+        });
     });
 
-    // ─── Hooks & Context ───────────────────────────────────────────────────
     describe('Hooks & Context', () => {
 
         it('before_build ve after_build akışı doğru olmalı', () => {
@@ -131,18 +176,63 @@ describe('BaR Unit Tests', () => {
             expect(afterFn).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 201 }));
         });
 
-        it('after_build hook payload immutable olmalı (structuredClone testi)', () => {
+        it('after_build hook payload immutable olmalı', () => {
             const hooks = new BaRHooks();
-            hooks.on('after_build', (payload) => {
-                payload.body.success = false; // Mutasyon denemesi
+            hooks.on('after_build', (payload: any) => {
+                payload.body.success = false;
             });
 
             const res = new ResponseBuilder(undefined, { hooks }).status(200).build();
-            expect(res.body.success).toBe(true); // Orijinal sonuç değişmemeli
+            expect(res.body.success).toBe(true);
+        });
+
+        it('hook listener yoksa structuredClone çağrılmamalı (performans)', () => {
+            const hooks = new BaRHooks();
+            const cloneSpy = jest.spyOn(global, 'structuredClone');
+
+            new ResponseBuilder(undefined, { hooks }).status(200).build();
+
+            expect(cloneSpy).not.toHaveBeenCalled();
+            cloneSpy.mockRestore();
+        });
+
+        it('hook listener varsa structuredClone kullanılmalı', () => {
+            const hooks = new BaRHooks();
+            hooks.on('after_build', () => {});
+            const cloneSpy = jest.spyOn(global, 'structuredClone');
+
+            new ResponseBuilder(undefined, { hooks }).status(200).build();
+
+            expect(cloneSpy).toHaveBeenCalled();
+            cloneSpy.mockRestore();
+        });
+
+        it('hook hata verirse error event emit edilmeli', () => {
+            const hooks = new BaRHooks();
+            const errorHook = jest.fn();
+            hooks.on('after_build', () => {
+                throw new Error('hook boom');
+            });
+            hooks.on('error', errorHook);
+
+            new ResponseBuilder(undefined, { hooks }).build();
+
+            expect(errorHook).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    sourceEvent: 'after_build',
+                    error: expect.any(Error),
+                }),
+            );
+        });
+
+        it('hasListeners doğru çalışmalı', () => {
+            const hooks = new BaRHooks();
+            expect(hooks.hasListeners('before_build')).toBe(false);
+            hooks.on('before_build', () => {});
+            expect(hooks.hasListeners('before_build')).toBe(true);
         });
     });
 
-    // ─── Presets (as.factory) ──────────────────────────────────────────────
     describe('ResponseAs - Presets', () => {
         const builder = () => new ResponseBuilder();
 
@@ -153,16 +243,31 @@ describe('BaR Unit Tests', () => {
             expect(res.body.message).toBe('SuccessMsg');
         });
 
+        it('as.ok() undefined data → null', () => {
+            const res = builder().as.ok(undefined).build();
+            expect(res.body.data).toBeNull();
+        });
+
         it('as.notFound() hata formatına uymalı', () => {
             const res = builder().as.notFound('Resource not found').build();
             expect(res.statusCode).toBe(404);
             expect(res.body.success).toBe(false);
             expect(res.body.message).toBe('Resource not found');
+            expect(res.body.data).toBeNull();
         });
 
-        it('as.noContent() data null olmalı', () => {
+        it('as.noContent() data null ve 204', () => {
             const res = builder().as.noContent().build();
             expect(res.statusCode).toBe(204);
+            expect(res.body.data).toBeNull();
+        });
+
+        it('data set edildikten sonra client error → data temizlenmeli', () => {
+            const res = builder()
+                .data({ leaked: true })
+                .as.badRequest('Bad')
+                .build();
+
             expect(res.body.data).toBeNull();
         });
     });

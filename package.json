@@ -1,9 +1,16 @@
 {
   "name": "@vorlaxen-labs/bar-js",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Professional API response builder for Node.js and TypeScript.",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "types": "./dist/index.d.ts",
   "type": "module",
   "files": [

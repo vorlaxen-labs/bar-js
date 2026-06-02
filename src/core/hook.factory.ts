@@ -1,22 +1,45 @@
 import { BaRHookEvent } from "../interfaces";
+import { Logger } from "../interfaces/IResponse.interface";
 
-type HookFn = (payload: any) => void;
+type HookFn = (payload: unknown) => void;
 
 export class BaRHooks {
-    private hooks: Partial<Record<BaRHookEvent, HookFn[]>> = {};
+  private hooks: Partial<Record<BaRHookEvent, HookFn[]>> = {};
+  private emittingError = false;
 
-    on(event: BaRHookEvent, fn: HookFn) {
-        if (!this.hooks[event]) this.hooks[event] = [];
-        this.hooks[event]!.push(fn);
-    }
+  constructor(private readonly logger?: Logger) {}
 
-    emit(event: BaRHookEvent, payload: any) {
-        this.hooks[event]?.forEach(fn => {
-            try {
-                fn(payload);
-            } catch (err) {
-                console.warn(`[BaR] Hook "${event}" threw an error:`, err);
-            }
-        });
+  on(event: BaRHookEvent, fn: HookFn) {
+    if (!this.hooks[event]) this.hooks[event] = [];
+    this.hooks[event]!.push(fn);
+  }
+
+  hasListeners(event: BaRHookEvent): boolean {
+    return (this.hooks[event]?.length ?? 0) > 0;
+  }
+
+  emit(event: BaRHookEvent, payload: unknown) {
+    const fns = this.hooks[event];
+    if (!fns?.length) return;
+
+    for (const fn of fns) {
+      try {
+        fn(payload);
+      } catch (err) {
+        this.logger?.warn?.(`[BaR] Hook "${event}" threw an error`, err);
+
+        if (event === "error" || this.emittingError) {
+          console.warn(`[BaR] Hook "${event}" threw an error:`, err);
+          continue;
+        }
+
+        this.emittingError = true;
+        try {
+          this.emit("error", { sourceEvent: event, error: err, payload });
+        } finally {
+          this.emittingError = false;
+        }
+      }
     }
+  }
 }

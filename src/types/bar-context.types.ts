@@ -1,5 +1,3 @@
-import { Logger } from "../interfaces";
-
 export interface BaRContext {
   /**
    * Unique request identifier (trace/correlation id)

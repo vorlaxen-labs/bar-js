@@ -1,7 +1,6 @@
 import {
   HeaderValue,
   IMetadata,
-  IResponse,
   PaginationMeta,
   QueuedCookie,
   ResponseBuilderOptions,
@@ -14,6 +13,7 @@ import {
   IBaRDispatcher,
 } from "../interfaces/IDispatcher.interface";
 import { BaRContext } from "../types/bar-context.types";
+import { BaRHookEvent } from "../interfaces";
 
 export class ResponseBuilder<T = unknown, M extends IMetadata = IMetadata> {
   private _statusCode: number = StatusCodes.SUCCESSFUL.OK;
@@ -54,7 +54,7 @@ export class ResponseBuilder<T = unknown, M extends IMetadata = IMetadata> {
     return this;
   }
 
-  public data(data: T): this {
+  public data(data: T | null): this {
     this._data = data;
     return this;
   }
@@ -88,9 +88,13 @@ export class ResponseBuilder<T = unknown, M extends IMetadata = IMetadata> {
   /**
    * @param total - Total record count.
    * @param page  - Current page (1-based).
-   * @param limit - Page size.
+   * @param limit - Page size (must be > 0).
    */
   public paginate(total: number, page: number, limit: number): this {
+    if (limit <= 0) {
+      throw new Error("BaR.paginate: limit must be greater than 0");
+    }
+
     const pagination: PaginationMeta = {
       total,
       page,
@@ -119,6 +123,11 @@ export class ResponseBuilder<T = unknown, M extends IMetadata = IMetadata> {
     return this;
   }
 
+  /** Alias for {@link setHeaders} (single header). */
+  public header(key: string, value: HeaderValue): this {
+    return this.setHeaders(key, value);
+  }
+
   public setCookies(name: string, value: string, options?: Record<string, unknown>): this;
   public setCookies(cookies: Record<string, string>, options?: Record<string, unknown>): this;
   public setCookies(
@@ -140,17 +149,43 @@ export class ResponseBuilder<T = unknown, M extends IMetadata = IMetadata> {
     return this;
   }
 
+  private resolvePublicErrorMessage(error: unknown): string {
+    const isProd = this.options?.environment === "production";
+
+    if (isProd) {
+      return "Internal Server Error";
+    }
+
+    if (error instanceof Error) {
+      if (this.options?.includeStack && error.stack) {
+        return error.stack;
+      }
+      return error.message;
+    }
+
+    return "Internal Server Error";
+  }
+
   /**
-   * Resolves a promise into {@link data}. On rejection, falls back to `500`
-   * and forwards the error message. Chain is always preserved.
+   * Resolves a promise into {@link data}. On rejection, falls back to `500`.
+   * In `production` environment, error details are not exposed to clients.
    * @param promise - Promise whose resolved type matches `T`.
    */
   public async wrap(promise: Promise<T>): Promise<this> {
     try {
       this.data(await promise);
     } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : "Internal Server Error";
-      this.status(StatusCodes.SERVER_ERROR.INTERNAL_SERVER_ERROR).message(msg);
+      const msg = this.resolvePublicErrorMessage(error);
+      this.status(StatusCodes.SERVER_ERROR.INTERNAL_SERVER_ERROR)
+        .data(null)
+        .message(msg)
+        .forceSuccess(false);
+
+      this.options?.hooks?.emit("error", {
+        error,
+        message: msg,
+        statusCode: StatusCodes.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+      });
     }
 
     return this;
@@ -185,6 +220,12 @@ export class ResponseBuilder<T = unknown, M extends IMetadata = IMetadata> {
     return new ResponseAs(this);
   }
 
+  private emitHook(event: BaRHookEvent, result: BaRFinalResult): void {
+    const hooks = this.options?.hooks;
+    if (!hooks?.hasListeners(event)) return;
+    hooks.emit(event, structuredClone(result));
+  }
+
   /**
    * Assembles and optionally dispatches the final response.
    *
@@ -202,11 +243,13 @@ export class ResponseBuilder<T = unknown, M extends IMetadata = IMetadata> {
       { request_id: this.context?.request_id },
     );
 
+    const normalizedData = this._data === undefined ? null : this._data;
+
     const result: BaRFinalResult = {
       body: {
         success: isSuccess,
         message: this._message ?? (isSuccess ? "Operation successful" : "Operation failed"),
-        data: this._data,
+        data: normalizedData,
         timestamp: new Date().toISOString(),
         metadata: finalMetadata,
       },
@@ -215,13 +258,13 @@ export class ResponseBuilder<T = unknown, M extends IMetadata = IMetadata> {
       cookies: this._cookies,
     };
 
-    this.options?.hooks?.emit("after_build", structuredClone(result));
+    this.emitHook("after_build", result);
     this.options?.logger?.debug?.("BaR built response", result);
 
     if (this.dispatcher) {
-      this.options?.hooks?.emit("before_dispatch", structuredClone(result));
+      this.emitHook("before_dispatch", result);
       const dispatched = this.dispatcher.dispatch(result);
-      this.options?.hooks?.emit("after_dispatch", structuredClone(result));
+      this.emitHook("after_dispatch", result);
       this.options?.logger?.info?.("BaR dispatched response", {
         statusCode: this._statusCode,
         success: isSuccess,

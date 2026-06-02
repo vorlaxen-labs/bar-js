@@ -1,6 +1,6 @@
 # 🥂 BaR (Builder a Response)
 
-[![npm version](https://img.shields.io/badge/npm-v1.0.0-blue.svg)](https://www.npmjs.com/package/@vorlaxen-labs/bar-js)
+[![npm version](https://img.shields.io/badge/npm-v2.0.0-blue.svg)](https://www.npmjs.com/package/@vorlaxen-labs/bar-js)
 [![License: MIT License](https://img.shields.io/badge/License-mit-blue.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue?logo=typescript)](https://www.typescriptlang.org/)
 
@@ -12,7 +12,7 @@
 
 ## ✨ Features
 
-*   🚀 **Framework Agnostic:** Seamlessly integrates with Express, Fastify, or Vanilla Node.js.
+*   🚀 **Framework Agnostic Core:** Built-in Express adapter; use `ResponseBuilder` + `IBaRDispatcher` for Fastify, Hono, or vanilla Node.js (see `example/adapters.md`).
 *   🔗 **Fluent Interface:** Build responses with an intuitive, chainable syntax.
 *   🛠️ **Adapter Strategy:** A single `.build()` call handles headers and framework-specific dispatching logic.
 *   🛡️ **Secure & Standardized:** Automatic security headers, request tracking (`request_id`), and ISO timestamps.
@@ -29,7 +29,7 @@ npm install @vorlaxen-labs/bar-js
 
 ## 🔌 Express.js Integration
 
-`BaR` uses a **Dispatcher Pattern**. The adapter injects `res.builder` and `res.bar` objects directly into the Express response cycle.
+`BaR` uses a **Dispatcher Pattern**. The adapter injects `req.bar` (request context) and `res.builder` (response builder) into the Express request/response cycle.
 
 ```typescript
 import express, { Request, Response } from 'express';
@@ -41,7 +41,8 @@ app.use(express.json());
 // 1. Configure the Adapter
 const bar = new BarExpressAdapter({
     withDefaultHeaders: true,
-    logger: console
+    environment: 'production', // hides internal errors from wrap()
+    logger: console,
 });
 
 // 2. Register as Middleware
@@ -49,8 +50,8 @@ app.use(bar.handler());
 
 // 3. Access Context (e.g., in a logger or custom middleware)
 app.use((req: Request, res: Response, next) => {
-    // Access request_id or metadata via res.bar.ctx
-    console.log('Request Tracing ID:', res.bar.ctx.request_id);
+    // Access request_id or metadata via req.bar.ctx
+    console.log('Request Tracing ID:', req.bar.ctx.request_id);
     next(); 
 });
 

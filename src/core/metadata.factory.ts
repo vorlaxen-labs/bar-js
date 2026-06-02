@@ -1,5 +1,5 @@
-import { IMetadata } from '../interfaces/IResponse.interface';
-import { CryptoUtil } from '../utils/crypto.util';
+import { IMetadata } from "../interfaces/IResponse.interface";
+import { CryptoUtil } from "../utils/crypto.util";
 
 export type MetadataOptions = Partial<IMetadata> & Record<string, any>;
 

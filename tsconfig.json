@@ -14,6 +14,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "ignoreDeprecations": "6.0",
     "types": ["jest", "node", "express"],
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },
