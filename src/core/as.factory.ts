@@ -2,10 +2,6 @@ import { StatusCodes } from '../constants/status-codes.constant';
 import { IMetadata } from '../interfaces/IResponse.interface';
 import { ResponseBuilder } from './response.factory';
 
-/**
- * @class ResponseAs
- * @description Provides semantic presets for the ResponseBuilder using standardized status codes.
- */
 export class ResponseAs<T, M extends IMetadata> {
   constructor(private readonly _builder: ResponseBuilder<T, M>) {}
 
