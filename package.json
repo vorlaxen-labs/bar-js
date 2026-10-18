@@ -1,0 +1,128 @@
+{
+  "name": "@vorlaxen-labs/bar-js",
+  "version": "1.0.0",
+  "description": "TypeScript API response builder for Express and Fastify — fluent chaining, consistent JSON schema, request IDs, and optional security headers.",
+  "author": "Vorlaxen Labs",
+  "keywords": [
+    "api",
+    "response",
+    "response-builder",
+    "typescript",
+    "nodejs",
+    "express",
+    "fastify",
+    "json",
+    "rest-api",
+    "middleware",
+    "standardized-api",
+    "request-id",
+    "fluent",
+    "bar",
+    "build-a-response",
+    "api-envelope",
+    "express-middleware",
+    "fastify-plugin"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "sideEffects": [
+    "./dist/adapters/express/index.js",
+    "./dist/adapters/express/index.cjs",
+    "./dist/adapters/fastify/index.js",
+    "./dist/adapters/fastify/index.cjs"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vorlaxen-labs/bar-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vorlaxen-labs/bar-js/issues"
+  },
+  "homepage": "https://github.com/vorlaxen-labs/bar-js#readme",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./adapters/express": {
+      "types": "./dist/adapters/express/index.d.ts",
+      "import": "./dist/adapters/express/index.js",
+      "require": "./dist/adapters/express/index.cjs"
+    },
+    "./adapters/fastify": {
+      "types": "./dist/adapters/fastify/index.d.ts",
+      "import": "./dist/adapters/fastify/index.js",
+      "require": "./dist/adapters/fastify/index.cjs"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsup src/index.ts src/adapters/express/index.ts src/adapters/fastify/index.ts --format cjs,esm --dts --clean",
+    "local-build": "npm run build && yalc push --force",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run typecheck && jest",
+    "test:unit": "jest --selectProjects unit",
+    "test:integration": "jest --selectProjects integration",
+    "test:parity": "jest --selectProjects integration --testPathPattern=adapter-parity",
+    "lint": "eslint .",
+    "prepublishOnly": "npm run build && npm run test",
+    "release:dry-run": "semantic-release --dry-run"
+  },
+  "peerDependencies": {
+    "express": "^4.21.0 || ^5.0.0",
+    "fastify": "^4.28.0 || ^5.0.0",
+    "@fastify/cookie": "^9.0.0 || ^10.0.0 || ^11.0.0"
+  },
+  "peerDependenciesMeta": {
+    "express": {
+      "optional": true
+    },
+    "fastify": {
+      "optional": true
+    },
+    "@fastify/cookie": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@fastify/cookie": "^9.4.0",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^12.0.6",
+    "@semantic-release/npm": "^13.1.5",
+    "@semantic-release/release-notes-generator": "^14.1.0",
+    "semantic-release": "^25.0.3",
+    "@swc/core": "^1.15.33",
+    "@swc/jest": "^0.2.39",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^29.5.14",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^25.6.0",
+    "@types/supertest": "^7.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.1",
+    "@typescript-eslint/parser": "^8.59.1",
+    "eslint": "^10.3.0",
+    "express": "^5.2.1",
+    "fastify": "^4.29.1",
+    "globals": "^17.6.0",
+    "jest": "^29.7.0",
+    "supertest": "^7.2.2",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.1"
+  }
+}
