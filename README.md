@@ -19,6 +19,8 @@
 - [Package exports](#package-exports)
 - [Usage](#usage)
 - [Documentation](#documentation)
+- [Security](#security)
+- [Contributing](#contributing)
 - [For maintainers](#for-maintainers)
 - [License](#license)
 
@@ -232,6 +234,18 @@ Guides live in **[docs/](docs/README.md)**:
 - Repository: [github.com/vorlaxen-labs/bar-js](https://github.com/vorlaxen-labs/bar-js)
 - OpenSSF Baseline Level 1: [project 16101](https://www.bestpractices.dev/en/projects/16101/baseline-1) (criteria v2026.08.28)
 - Corpus Hub: [vorlaxen-labs--bar-js](https://hub.xerj.org/corpus/vorlaxen-labs--bar-js)
+- Security reports: [SECURITY.md](SECURITY.md)
+- Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## Security
+
+Report vulnerabilities in private. See [SECURITY.md](SECURITY.md). Do not open a public issue for a security problem.
+
+Default response headers, cookie flags, and production error masking are described in that file and in [docs/adapters.md](docs/adapters.md).
+
+## Contributing
+
+Issues and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). Questions that are not bugs go through the [issue templates](https://github.com/vorlaxen-labs/bar-js/issues/new/choose).
 
 ## For maintainers
 

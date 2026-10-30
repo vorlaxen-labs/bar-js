@@ -1,0 +1,61 @@
+name: Bug report
+description: Something is wrong in the builder or an adapter
+title: "[bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Security problems go to [private vulnerability reporting](https://github.com/vorlaxen-labs/bar-js/security/advisories/new), not this form.
+
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      description: Output of `npm ls @vorlaxen-labs/bar-js`, or the git revision if you are on a checkout.
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: adapter
+    attributes:
+      label: Adapter
+      options:
+        - Express
+        - Fastify
+        - Core builder only
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: A short route or script that shows the problem.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include the JSON body and status code when you have them.
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: "Node 22.x, Express 5 / Fastify 4"
+    validations:
+      required: false

@@ -44,3 +44,6 @@ flowchart TB
 
 - npm: [`@vorlaxen-labs/bar-js`](https://www.npmjs.com/package/@vorlaxen-labs/bar-js)
 - Repository: [github.com/vorlaxen-labs/bar-js](https://github.com/vorlaxen-labs/bar-js)
+- Security: [SECURITY.md](../SECURITY.md)
+- Contributing: [CONTRIBUTING.md](../CONTRIBUTING.md)
+- Support: [SUPPORT.md](../.github/SUPPORT.md)

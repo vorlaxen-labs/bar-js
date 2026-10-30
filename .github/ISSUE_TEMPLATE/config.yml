@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/vorlaxen-labs/bar-js/security/advisories/new
+    about: Report a vulnerability in private. Do not open a public issue.
+  - name: Documentation
+    url: https://github.com/vorlaxen-labs/bar-js/tree/main/docs
+    about: Install, adapters, and the response envelope
+  - name: npm package
+    url: https://www.npmjs.com/package/@vorlaxen-labs/bar-js
+    about: Published versions of @vorlaxen-labs/bar-js
