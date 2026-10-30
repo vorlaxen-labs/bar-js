@@ -4,7 +4,7 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/vorlaxen-labs/bar-js/ci.yml?branch=main&label=CI)](https://github.com/vorlaxen-labs/bar-js/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![OpenSSF Baseline](https://www.bestpractices.dev/projects/16101/baseline)](https://www.bestpractices.dev/projects/16101)
+[![OpenSSF Baseline Level 1](https://www.bestpractices.dev/projects/16101/baseline)](https://www.bestpractices.dev/en/projects/16101/baseline-1)
 [![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/vorlaxen/badge.svg)](https://hub.xerj.org/contributors/vorlaxen)
 
 **BaR** (**Build a Response**) is a framework-agnostic TypeScript library for Node.js APIs. It gives you a fluent `ResponseBuilder`, a consistent JSON response envelope, and optional adapters for **Express** and **Fastify**. You chain status, message, data, headers, and cookies, then call `.build()` once. An **adapter** attaches the builder to your framework; a **dispatcher** sends the finished response over HTTP.
@@ -230,7 +230,7 @@ Guides live in **[docs/](docs/README.md)**:
 
 - npm: [`@vorlaxen-labs/bar-js`](https://www.npmjs.com/package/@vorlaxen-labs/bar-js)
 - Repository: [github.com/vorlaxen-labs/bar-js](https://github.com/vorlaxen-labs/bar-js)
-- OpenSSF Best Practices: [project 16101](https://www.bestpractices.dev/projects/16101) (Baseline Level 1, criteria v2026.08.28)
+- OpenSSF Baseline Level 1: [project 16101](https://www.bestpractices.dev/en/projects/16101/baseline-1) (criteria v2026.08.28)
 - Corpus Hub: [vorlaxen-labs--bar-js](https://hub.xerj.org/corpus/vorlaxen-labs--bar-js)
 
 ## For maintainers
