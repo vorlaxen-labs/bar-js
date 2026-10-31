@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![OpenSSF Baseline Level 1](https://www.bestpractices.dev/projects/16101/baseline)](https://www.bestpractices.dev/en/projects/16101/baseline-1)
-[![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/vorlaxen/badge.svg)](https://hub.xerj.org/contributors/vorlaxen)
+[![XERJ Hub](https://img.shields.io/badge/XERJ_Hub-bar--js-7c3aed)](https://hub.xerj.org/corpus/vorlaxen-labs--bar-js)
 
 **BaR** (**Build a Response**) is a framework-agnostic TypeScript library for Node.js APIs. It gives you a fluent `ResponseBuilder`, a consistent JSON response envelope, and optional adapters for **Express** and **Fastify**. You chain status, message, data, headers, and cookies, then call `.build()` once. An **adapter** attaches the builder to your framework; a **dispatcher** sends the finished response over HTTP.
 
